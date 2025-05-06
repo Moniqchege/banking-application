@@ -21,6 +21,7 @@ export class StandingOrderService {
     orders.push(newOrder);
     localStorage.setItem(this.storageKey, JSON.stringify(orders));
   }
+  
 
   delete(id: string): void {
     const orders = this.getAll().filter((o) => o.id !== id);

@@ -51,7 +51,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">Description</th>
+          <th scope="col">Account Holder</th>
           <th scope="col">Source Account</th>
           <th scope="col">Destination Account</th>
           <th scope="col">Amount</th>
@@ -62,8 +62,8 @@
       <tbody>
         <tr *ngFor="let order of orders">
           <td>{{ order.description }}</td>
-          <td>{{ order.sourceAccountId }}</td>
-          <td>{{ order.destinationAccountId }}</td>
+          <td>{{ order.fromAccount }}</td>
+          <td>{{ order.toAccount }}</td>
           <td>{{ order.amount }}</td>
           <td>{{ order.nextExecutionDate | date }}</td>
           <td>

@@ -26,10 +26,10 @@ export class SchedulerService {
   private processStandingOrder(order: StandingOrder): void {
     const accounts = this.accountService.getAccounts();
     const sourceAccount = accounts.find(
-      (acc) => acc.id === order.sourceAccountId
+      (acc) => acc.id === order.fromAccount
     );
     const destinationAccount = accounts.find(
-      (acc) => acc.id === order.destinationAccountId
+      (acc) => acc.id === order.toAccount
     );
 
     if (
@@ -45,8 +45,8 @@ export class SchedulerService {
 
       const transaction: Transaction = {
         id: `${new Date().getTime()}`,
-        sourceAccountId: order.sourceAccountId,
-        destinationAccountId: order.destinationAccountId,
+        sourceAccountId: order.fromAccount,
+        destinationAccountId: order.toAccount,
         amount: order.amount,
         currency: order.currency,
         status: 'completed',
@@ -55,9 +55,8 @@ export class SchedulerService {
 
       this.transactionService.save(transaction);
 
-      order.nextExecutionDate = this.calculateNextExecutionDate(
-        order.frequency
-      );
+      order.nextExecutionDate = this.calculateNextExecutionDate(order.frequency).toISOString();
+
       this.updateStandingOrder(order);
     }
   }

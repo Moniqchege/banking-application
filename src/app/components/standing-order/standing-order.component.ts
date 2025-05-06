@@ -57,15 +57,15 @@ export class StandingOrderComponent implements OnInit {
       const destinationAccount = this.accounts.find(
         (acc) => acc.id === this.form.value.destinationAccountId
       );
-
+  
       const validAccountPrefixes = ['SA', 'CA', 'IA'];
-
+  
       if (
-        (sourceAccount &&
-          destinationAccount &&
-          !validAccountPrefixes.some((prefix) =>
-            sourceAccount.accountNumber.startsWith(prefix)
-          )) ||
+        !sourceAccount ||
+        !destinationAccount ||
+        !validAccountPrefixes.some((prefix) =>
+          sourceAccount.accountNumber.startsWith(prefix)
+        ) ||
         !validAccountPrefixes.some((prefix) =>
           destinationAccount.accountNumber.startsWith(prefix)
         )
@@ -75,14 +75,31 @@ export class StandingOrderComponent implements OnInit {
         );
         return;
       }
-
-      this.form.value.description =
-        sourceAccount?.accountHolderName || 'Unknown Account Holder';
-
-      this.standingOrderService.save(this.form.value);
-      this.orders = this.standingOrderService.getAll();
-
+  
+      // Get customer name from source account’s customerId
+      const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      const sourceCustomer = customers.find(
+        (c: any) => c.id === sourceAccount.customerId
+      );
+      const customerName = sourceCustomer
+        ? `${sourceCustomer.firstName} ${sourceCustomer.lastName}`
+        : 'Unknown';
+  
+      const newOrder = {
+        amount: this.form.value.amount,
+        currency: this.form.value.currency,
+        frequency: this.form.value.frequency,
+        nextExecutionDate: this.form.value.nextExecutionDate,
+        fromAccount: sourceAccount.accountNumber,
+        toAccount: destinationAccount.accountNumber,
+        description: customerName,
+      };
+  
+      this.standingOrderService.save(newOrder);
+      this.orders = this.standingOrderService.getAll().reverse(); // newest first
       this.form.reset();
     }
   }
+  
+  
 }

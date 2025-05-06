@@ -1,11 +1,12 @@
 export interface StandingOrder {
   id: string;
-  sourceAccountId: string;
-  destinationAccountId: string;
+  fromAccount: string; // e.g. "SA879847"
+  toAccount: string;   // e.g. "CA123456"
   amount: number;
   currency: string;
-  frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
-  nextExecutionDate: Date;
+  frequency: string;
+  nextExecutionDate: string;
+  description: string; // Account holder's name
   createdAt: Date;
-  description: string;
 }
+
