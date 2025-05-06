@@ -4,6 +4,7 @@ import { TransactionService } from './transaction.service';
 import { AccountService } from './account.service';
 import { Transaction } from '../models/transaction.model';
 import { Customer } from '../models/customer.model';
+import { Account } from '../models/account.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,35 +16,36 @@ export class SchedulerService {
   ) {}
 
   runScheduler(): void {
-    const standingOrders: StandingOrder[] = JSON.parse(
-      localStorage.getItem('standingOrders') || '[]'
-    );
-
-    standingOrders.forEach((order) => {
-      this.processStandingOrder(order);
-    });
-  }
-
-  private processStandingOrder(order: StandingOrder): void {
-    const accounts = this.accountService.getAccounts();
-    const fromAccount = accounts.find(acc => acc.id === order.fromAccount);
-    const toAccount = accounts.find(acc => acc.id === order.toAccount);
+    const standingOrders: StandingOrder[] = JSON.parse(localStorage.getItem('standingOrders') || '[]');
+    let hasErrors = false;
   
-    if (!fromAccount || !toAccount) return;
+    standingOrders.forEach((order) => {
+      const success = this.processStandingOrder(order);
+      if (!success) {
+        hasErrors = true;
+      }
+    });
+  
+    if (!hasErrors) {
+      alert('Scheduler has run successfully!');
+    }
+  }
+  
+
+  private processStandingOrder(order: StandingOrder): boolean {
+    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+    const fromAccount = accounts.find((acc:Account) => acc.id === order.fromAccount);
+    const toAccount = accounts.find((acc:Account) => acc.id === order.toAccount);
+  
+    if (!fromAccount || !toAccount) return false;
   
     if (fromAccount.balance < order.amount) {
-      const customers = JSON.parse(localStorage.getItem('customers') || '[]');
-      const customer = customers.find((c: Customer) => c.id === fromAccount.customerId);
-      const name = customer ? `${customer.firstName} ${customer.lastName}` : fromAccount.accountNumber;
-      alert(`Insufficient funds in ${name}`);
-      return;
+      alert(`Insufficient funds in ${fromAccount.accountNumber}`);
+      return false;
     }
   
     fromAccount.balance -= order.amount;
     toAccount.balance += order.amount;
-  
-    this.accountService.updateAccount(fromAccount);
-    this.accountService.updateAccount(toAccount);
   
     const transaction: Transaction = {
       id: `${new Date().getTime()}`,
@@ -55,16 +57,18 @@ export class SchedulerService {
       createdAt: new Date()
     };
   
-    this.transactionService.save(transaction);
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    transactions.push(transaction);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    localStorage.setItem('accounts', JSON.stringify(accounts));
   
-    order.nextExecutionDate = this.calculateNextExecutionDate(order.frequency).toISOString();
-    this.updateStandingOrder(order);
+    return true;
   }
+  
 
   runSingleOrder(order: StandingOrder): void {
     this.processStandingOrder(order);
   }
-  
 
   private calculateNextExecutionDate(frequency: string): Date {
     const currentDate = new Date();

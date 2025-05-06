@@ -62,8 +62,8 @@
       <tbody>
         <tr *ngFor="let order of orders">
           <td>{{ order.description }}</td>
-          <td>{{ order.fromAccount }}</td>
-          <td>{{ order.toAccount }}</td>
+          <td>{{ accountMap.get(order.fromAccount) }}</td>
+          <td>{{ accountMap.get(order.toAccount) }}</td>
           <td>{{ order.amount }}</td>
           <td>{{ order.nextExecutionDate | date }}</td>
           <td>

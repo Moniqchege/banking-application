@@ -10,6 +10,7 @@ import { AccountService } from '../../core/services/account.service';
 import { SchedulerService } from '../../core/services/scheduler.service';
 import { CommonModule } from '@angular/common';
 import { StandingOrder } from '../../core/models/standing-order.model';
+import { Account } from '../../core/models/account.model';
 
 @Component({
   selector: 'app-standing-order',
@@ -19,7 +20,7 @@ import { StandingOrder } from '../../core/models/standing-order.model';
 })
 export class StandingOrderComponent implements OnInit {
   form!: FormGroup;
-  accounts: any[] = [];
+  accounts: Account[] = [];
   orders: any[] = [];
 
   constructor(
@@ -28,6 +29,8 @@ export class StandingOrderComponent implements OnInit {
     private accountService: AccountService,
     private schedulerService: SchedulerService
   ) {}
+
+  accountMap = new Map<string, string>();
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -42,6 +45,10 @@ export class StandingOrderComponent implements OnInit {
 
     this.accounts = this.accountService.getAccounts();
     this.orders = this.standingOrderService.getAll();
+
+    this.accounts.forEach((account: Account) => {
+      this.accountMap.set(account.id, account.accountNumber);
+    });
   }
 
   runScheduler(): void {
