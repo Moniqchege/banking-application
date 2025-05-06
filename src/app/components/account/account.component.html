@@ -1,12 +1,81 @@
-<h2>Create Account</h2>
-    <form (ngSubmit)="createAccount()">
-      <select [(ngModel)]="account.customer" name="customer">
-        <option *ngFor="let c of customers" [value]="c.name">{{ c.name }}</option>
-      </select>
-      <select [(ngModel)]="account.type" name="type">
-        <option>Savings</option>
-        <option>Current</option>
-      </select>
-      <button type="submit">Create Account</button>
-    </form>
-    <p *ngIf="success">Account created!</p>
+<div class="container my-4">
+  <h3 class="text-success mb-4">Create New Account</h3>
+  <form
+    [formGroup]="accountForm"
+    (ngSubmit)="createAccount()"
+    class="bg-light p-4 rounded shadow-sm"
+  >
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="form-label" for="select customer">Select Customer</label>
+        <select id="select customer" class="form-select" formControlName="customerId" required>
+          <option *ngFor="let cust of customers" [value]="cust.id">
+            {{ cust.firstName }} {{ cust.lastName }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="account type">Account Type</label>
+        <select id="account type" class="form-select" formControlName="type" required>
+          <option value="savings">Savings</option>
+          <option value="checking">Checking</option>
+          <option value="investment">Investment</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="initial-balance">Initial Balance</label>
+        <input id="initial-balance" type="number" class="form-control" formControlName="balance" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="currency">Currency</label>
+        <input id="currency" type="text" class="form-control" formControlName="currency" />
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="btn btn-success w-100"
+      [disabled]="accountForm.invalid"
+    >
+      {{ isEdit ? 'Update Account' : 'Create Account' }}
+    </button>
+  </form>
+
+  <hr class="my-5" />
+
+  <h4 class="text-primary">All Accounts</h4>
+  <table class="table table-striped table-hover mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>Account No</th>
+        <th>Customer</th>
+        <th>Type</th>
+        <th>Balance</th>
+        <th>Currency</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let acc of accounts">
+        <td>{{ acc.accountNumber }}</td>
+        <td>{{ getCustomerName(acc.customerId) }}</td>
+        <td>{{ acc.type | titlecase }}</td>
+        <td>{{ acc.balance }}</td>
+        <td>{{ acc.currency }}</td>
+        <td>{{ acc.createdAt | date : "medium" }}</td>
+        <td>
+          <i
+            class="fa-solid fa-pen-to-square text-warning me-2"
+            style="cursor: pointer"
+            (click)="editAccount(acc)"
+          ></i>
+          <i
+            class="fa-solid fa-trash text-danger me-2"
+            style="cursor: pointer"
+            (click)="deleteAccount(acc.id)"
+          ></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

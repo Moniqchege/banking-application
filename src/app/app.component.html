@@ -1,75 +1,43 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<nav class="navbar navbar-expand-lg custom-navbar shadow-sm">
   <div class="container">
-    
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="fa-solid fa-piggy-bank me-2"></i>BankingApp
+    </a>
+
     <button
       aria-label="Toggle navigation"
-      class="navbar-toggler"
+      class="navbar-toggler border-0"
       type="button"
       (click)="isMenuCollapsed = !isMenuCollapsed"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            (click)="toggleCollapseOnNavClick()"
-          >
-            Home
-          </a>
+        <li class="nav-item" *ngIf="isLoggedIn()">
+          <a class="nav-link" routerLink="/customer" routerLinkActive="active">Customer</a>
         </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/customer"
-            routerLinkActive="active"
-            (click)="toggleCollapseOnNavClick()"
-          >
-            Customers
-          </a>
+        <li class="nav-item" *ngIf="isLoggedIn()">
+          <a class="nav-link" routerLink="/account" routerLinkActive="active">Accounts</a>
         </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/account"
-            routerLinkActive="active"
-            (click)="toggleCollapseOnNavClick()"
-          >
-            Account
-          </a>
+        <li class="nav-item" *ngIf="isLoggedIn()">
+          <a class="nav-link" routerLink="/standing-order" routerLinkActive="active">Standing Orders</a>
         </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/standing-order"
-            routerLinkActive="active"
-            (click)="toggleCollapseOnNavClick()"
-          >
-            Standing Order
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/scheduler"
-            routerLinkActive="active"
-            (click)="toggleCollapseOnNavClick()"
-          >
-            Run Scheduler
-          </a>
+        
+        <li class="nav-item" *ngIf="isLoggedIn()">
+          <a class="nav-link" routerLink="/scheduler" routerLinkActive="active">Run Scheduler</a>
         </li>
       </ul>
+
       <div class="d-flex ms-3">
         <button
-          class="btn btn-outline-light"
+          class="btn btn-outline-light rounded-pill"
           type="button"
-          (click)="openModal(); toggleCollapseOnNavClick()"
+          (click)="isLoggedIn() ? logout() : openModal(); toggleCollapseOnNavClick()"
         >
-          <i class="fa-solid fa-user"></i> Signin
+          <i class="fa-solid fa-user me-1"></i>
+          {{ isLoggedIn() ? 'Logout' : 'Signin' }}
         </button>
       </div>
     </div>
@@ -80,22 +48,22 @@
   <router-outlet></router-outlet>
 </main>
 
+<!-- Modal for Login/Signup -->
 <div class="modal" #loginModal tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body p-4">
         <div class="text-center mb-4">
-          <h4 class="modal-title fw-bold" id="authModalTitle">Welcome Back!</h4>
+          <h4 class="modal-title fw-bold">Welcome Back!</h4>
           <button
             type="button"
             class="btn-close position-absolute top-0 end-0 m-3"
             (click)="closeModal()"
-            data-bs-dismiss="modal"
-            aria-label="close"
+            aria-label="Close"
           ></button>
         </div>
-        @if (isLoginFormVisible()) {
-        <form id="loginForm" class="needs-validation">
+
+        <form *ngIf="isLoginFormVisible()" (ngSubmit)="onLogin()" class="needs-validation">
           <div class="mb-3">
             <input
               type="email"
@@ -116,25 +84,16 @@
               required
             />
           </div>
-          <button
-            type="submit"
-            class="btn btn-primary w-100 mb-3"
-            (click)="onLogin()"
-          >
+          <button type="submit" class="btn btn-primary w-100 mb-3">
             Login
           </button>
           <p class="text-center">
             Don't have an account?
-            <a
-              id="showSignup"
-              class="text-decoration-none"
-              (click)="toggleForm()"
-              >Sign Up</a
-            >
+            <a class="text-decoration-none" (click)="toggleForm()">Sign Up</a>
           </p>
         </form>
-        } @else {
-        <form id="signupForm" class="needs-validation cursor-pointer">
+
+        <form *ngIf="!isLoginFormVisible()" (ngSubmit)="onRegister()" class="needs-validation">
           <div class="mb-3">
             <input
               type="text"
@@ -175,24 +134,14 @@
               required
             />
           </div>
-          <button
-            type="submit"
-            class="btn btn-primary w-100 mb-3"
-            (click)="onRegister()"
-          >
+          <button type="submit" class="btn btn-primary w-100 mb-3">
             Sign Up
           </button>
           <p class="text-center">
             Already have an account?
-            <a
-              id="showLogin"
-              class="text-decoration-none"
-              (click)="toggleForm()"
-              >Login</a
-            >
+            <a class="text-decoration-none" (click)="toggleForm()">Login</a>
           </p>
         </form>
-        }
       </div>
     </div>
   </div>

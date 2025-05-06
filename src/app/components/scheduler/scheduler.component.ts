@@ -8,28 +8,46 @@ export interface StandingOrder {
   schedule: string;
 }
 
-
 @Component({
   selector: 'app-scheduler',
-  imports: [ CommonModule],
+  imports: [CommonModule],
   templateUrl: './scheduler.component.html',
-  styleUrl: './scheduler.component.css'
+  styleUrls: ['./scheduler.component.css'],
 })
 export class SchedulerComponent {
-  message = '';
+  message: string = '';
 
   runScheduler() {
-    const standingOrders = JSON.parse(localStorage.getItem('standingOrders') || '[]');
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-
-    
+    const standingOrders: StandingOrder[] = JSON.parse(
+      localStorage.getItem('standingOrders') || '[]'
+    );
+    const accounts: any[] = JSON.parse(
+      localStorage.getItem('accounts') || '[]'
+    );
 
     standingOrders.forEach((order: StandingOrder) => {
-      // Now TypeScript knows what `order` is
-      console.log(order.amount);
+      const sourceAccount = accounts.find(
+        (acc: any) => acc.accountNumber === order.sourceAccount
+      );
+      const destinationAccount = accounts.find(
+        (acc: any) => acc.accountNumber === order.destinationAccount
+      );
+
+      if (sourceAccount && destinationAccount) {
+        sourceAccount.balance -= order.amount;
+
+        destinationAccount.balance += order.amount;
+
+        console.log(
+          `Transfer of ${order.amount} from ${order.sourceAccount} to ${order.destinationAccount}`
+        );
+      } else {
+        console.error('Invalid account details for standing order', order);
+      }
     });
 
     localStorage.setItem('accounts', JSON.stringify(accounts));
+
     this.message = 'Scheduler executed and balances updated.';
   }
 }

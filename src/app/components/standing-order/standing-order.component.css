@@ -1,0 +1,35 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #4e9f3d; /* Jungle green */
+  }
+  
+  .table {
+    width: 100%;
+    margin-top: 20px;
+    background-color: #f4f4f4;
+  }
+  
+  th, td {
+    text-align: center;
+  }
+  
+  button {
+    background-color: #4e9f3d; /* Jungle green */
+    color: white;
+    border: none;
+  }
+  
+  button:hover {
+    background-color: #3d7e2b;
+  }
+  
+  th {
+    background-color: #2d6a2b;
+    color: white;
+  }
+  

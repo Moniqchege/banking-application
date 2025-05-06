@@ -1,1 +1,66 @@
-<p>customer works!</p>
+<div class="card p-4 shadow-lg bg-light">
+  <h4 class="text-dark mb-3">{{ isEdit ? 'Update Customer' : 'Register Customer' }}</h4>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <input class="form-control" placeholder="First Name" formControlName="firstName" />
+        <small *ngIf="form.get('firstName')?.invalid && form.get('firstName')?.touched" class="text-danger">Required</small>
+      </div>
+      <div class="col-md-6 mb-3">
+        <input class="form-control" placeholder="Last Name" formControlName="lastName" />
+        <small *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched" class="text-danger">Required</small>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <input class="form-control" placeholder="Email" formControlName="email" />
+        <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="text-danger">Valid email required</small>
+      </div>
+      <div class="col-md-6 mb-3">
+        <input class="form-control" placeholder="Phone" formControlName="phone" />
+        <small *ngIf="form.get('phone')?.invalid && form.get('phone')?.touched" class="text-danger">Required</small>
+      </div>
+    </div>
+
+    <textarea class="form-control mb-3" placeholder="Address" formControlName="address"></textarea>
+
+    <input type="date" class="form-control mb-3" formControlName="dateOfBirth" aria-label="date of birth" />
+
+    <button class="btn btn-light fw-bold" type="submit" [disabled]="form.invalid">
+       {{ isEdit ? 'Update' : 'Register' }}
+    </button>
+  </form>
+</div>
+
+<hr class="my-4" />
+
+<div class="card p-3">
+  <h5 class="mb-3">Registered Customers</h5>
+  <table class="table table-hover table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>DOB</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cust of customers; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ cust.firstName }} {{ cust.lastName }}</td>
+        <td>{{ cust.email }}</td>
+        <td>{{ cust.phone }}</td>
+        <td>{{ cust.dateOfBirth | date }}</td>
+        <td>
+          <i class="fa-solid fa-pen-to-square text-warning me-3 cursor-pointer" (click)="editCustomer(cust)"></i>
+          <i class="fa-solid fa-trash text-danger cursor-pointer" (click)="deleteCustomer(cust.id)"></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

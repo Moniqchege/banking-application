@@ -1,32 +1,25 @@
-import { Component, ElementRef, signal, ViewChild } from '@angular/core';
-import {
-  Router,
-  RouterLink,
-  RouterLinkActive,
-  RouterOutlet,
-} from '@angular/router';
+import { Component, computed, ElementRef, signal, ViewChild } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap'; // 👈 Add this
-import { loginUser, RegisterUser } from './core/models/user.model';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     FormsModule,
     CommonModule,
     NgbCollapse,
+    RouterOutlet, RouterLink
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   isMenuCollapsed = true;
-  title = 'Bus Ticket Booking';
+  title = 'BankingApp';
   currentYear: number = new Date().getFullYear();
 
   @ViewChild('loginModal') loginModal!: ElementRef;
@@ -34,7 +27,14 @@ export class AppComponent {
   isLoginFormVisible = signal<boolean>(true);
   loggedInUser = signal<any>(null);
 
-  registerObj: RegisterUser = {
+  navItems = [
+    { label: 'Customers', link: '/customer' },
+    { label: 'Account', link: '/account' },
+    { label: 'Standing Order', link: '/standing-order' },
+    { label: 'Run Scheduler', link: '/scheduler' },
+  ];
+
+  registerObj = {
     userId: 0,
     email: '',
     password: '',
@@ -43,18 +43,17 @@ export class AppComponent {
     mobileNo: '',
   };
 
-  loginObj: loginUser = {
+  loginObj = {
     email: '',
     password: '',
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
+  isLoggedIn = computed(() => this.loggedInUser() !== null);
+
 
   ngOnInit() {
-    const user = localStorage.getItem('loggedInUser');
-    if (user) {
-      this.loggedInUser.set(JSON.parse(user));
-    }
+    this.loggedInUser.set(this.authService.getLoggedInUser());
   }
 
   toggleForm() {
@@ -81,43 +80,30 @@ export class AppComponent {
   }
 
   onRegister() {
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-    const userExists = existingUsers.some(
-      (user: any) => user.email === this.registerObj.email
-    );
+    const userExists = this.authService.checkUserExists(this.registerObj.email);
     if (userExists) {
       alert('User email already exists');
       return;
     }
 
-    existingUsers.push(this.registerObj);
-
-    localStorage.setItem('users', JSON.stringify(existingUsers));
+    this.authService.registerUser(this.registerObj);
     alert('Registration Successful');
     this.isLoginFormVisible.set(true);
   }
 
   onLogin() {
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-    const user = existingUsers.find(
-      (u: any) =>
-        u.email === this.loginObj.email && u.password === this.loginObj.password
-    );
+    const user = this.authService.authenticateUser(this.loginObj.email, this.loginObj.password);
     if (user) {
-      localStorage.setItem('loggedInUser', JSON.stringify(user));
       this.loggedInUser.set(user);
-
       this.closeModal();
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/customer']);
     } else {
       alert('Invalid email or password');
     }
   }
 
   logout() {
-    localStorage.removeItem('loggedInUser');
+    this.authService.logout();
     this.loggedInUser.set(null);
     this.router.navigate(['/']);
   }
@@ -126,5 +112,9 @@ export class AppComponent {
     if (window.innerWidth < 992) {
       this.isMenuCollapsed = true;
     }
+  }
+
+  isHomePage() {
+    return this.router.url === '/';
   }
 }

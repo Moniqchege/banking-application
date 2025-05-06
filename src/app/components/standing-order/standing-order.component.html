@@ -1,9 +1,77 @@
-<h2>Create Standing Order</h2>
-<form (ngSubmit)="createStandingOrder()">
-  <input [(ngModel)]="order.source" name="source" placeholder="Source Account" required />
-  <input [(ngModel)]="order.destination" name="destination" placeholder="Destination Account" required />
-  <input [(ngModel)]="order.amount" name="amount" placeholder="Amount" type="number" required />
-  <input [(ngModel)]="order.schedule" name="schedule" placeholder="Schedule" required />
-  <button type="submit">Create Standing Order</button>
-</form>
-<p *ngIf="success">Standing Order Created!</p>
+<form [formGroup]="form" (ngSubmit)="submit()" class="card p-4 shadow-sm bg-light">
+    <h5 class="text-jungle-green">Create Standing Order</h5>
+    <div class="mb-3">
+      <label class="form-label" for="fromAccount">From Account</label>
+      <select id="fromAccount" class="form-select" formControlName="sourceAccountId">
+        <option *ngFor="let acc of accounts" [value]="acc.id">{{ acc.accountNumber }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="toAccount">To Account</label>
+      <select id="toAccount" class="form-select" formControlName="destinationAccountId">
+        <option *ngFor="let acc of accounts" [value]="acc.id">{{ acc.accountNumber }}</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label" for="amount">Amount</label>
+        <input id="amount" type="number" class="form-control" formControlName="amount" />
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label" for="currency">Currency</label>
+        <select id="currency" class="form-select" formControlName="currency">
+          <option value="KES">KES</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="frequency">Frequency</label>
+      <select id="frequency" class="form-select" formControlName="frequency">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" >Next Execution Date</label>
+      <input type="date" class="form-control" formControlName="nextExecutionDate" aria-label="execution" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="description">Description</label>
+      <input id=description type="text" class="form-control" formControlName="description" />
+    </div>
+    <button type="submit" class="btn btn-success w-100">Create Standing Order</button>
+  </form>
+
+  <div class="container mt-5">
+    <h2>Standing Orders</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Description</th>
+          <th scope="col">Source Account</th>
+          <th scope="col">Destination Account</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Next Execution Date</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.description }}</td>
+          <td>{{ order.sourceAccountId }}</td>
+          <td>{{ order.destinationAccountId }}</td>
+          <td>{{ order.amount }}</td>
+          <td>{{ order.nextExecutionDate | date }}</td>
+          <td>
+            <button class="btn btn-primary" (click)="runScheduler()">Run Scheduler</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  
