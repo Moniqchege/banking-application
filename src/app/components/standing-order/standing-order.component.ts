@@ -9,6 +9,7 @@ import { StandingOrderService } from '../../core/services/standing-order.service
 import { AccountService } from '../../core/services/account.service';
 import { SchedulerService } from '../../core/services/scheduler.service';
 import { CommonModule } from '@angular/common';
+import { StandingOrder } from '../../core/models/standing-order.model';
 
 @Component({
   selector: 'app-standing-order',
@@ -100,6 +101,14 @@ export class StandingOrderComponent implements OnInit {
       this.form.reset();
     }
   }
-  
-  
+
+  runSingleScheduler(order: StandingOrder): void {
+    this.schedulerService.runSingleOrder(order);
+    this.orders = this.standingOrderService.getAll();
+  }
+
+  deleteOrder(id: string): void {
+    this.standingOrderService.delete(id);
+    this.orders = this.standingOrderService.getAll();
+  }
 }

@@ -67,7 +67,8 @@
           <td>{{ order.amount }}</td>
           <td>{{ order.nextExecutionDate | date }}</td>
           <td>
-            <button class="btn btn-primary" (click)="runScheduler()">Run Scheduler</button>
+            <button class="btn btn-primary" (click)="runScheduler()">Run</button>
+            <button (click)="deleteOrder(order.id)" class="btn btn-danger ms-2">Delete</button>
           </td>
         </tr>
       </tbody>
