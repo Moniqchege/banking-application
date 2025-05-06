@@ -1,0 +1,12 @@
+<h2>Create Account</h2>
+    <form (ngSubmit)="createAccount()">
+      <select [(ngModel)]="account.customer" name="customer">
+        <option *ngFor="let c of customers" [value]="c.name">{{ c.name }}</option>
+      </select>
+      <select [(ngModel)]="account.type" name="type">
+        <option>Savings</option>
+        <option>Current</option>
+      </select>
+      <button type="submit">Create Account</button>
+    </form>
+    <p *ngIf="success">Account created!</p>

@@ -1,0 +1,9 @@
+<h2>Create Standing Order</h2>
+<form (ngSubmit)="createStandingOrder()">
+  <input [(ngModel)]="order.source" name="source" placeholder="Source Account" required />
+  <input [(ngModel)]="order.destination" name="destination" placeholder="Destination Account" required />
+  <input [(ngModel)]="order.amount" name="amount" placeholder="Amount" type="number" required />
+  <input [(ngModel)]="order.schedule" name="schedule" placeholder="Schedule" required />
+  <button type="submit">Create Standing Order</button>
+</form>
+<p *ngIf="success">Standing Order Created!</p>
