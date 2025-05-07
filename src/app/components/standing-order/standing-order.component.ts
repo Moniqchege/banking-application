@@ -44,9 +44,13 @@ export class StandingOrderComponent implements OnInit {
     });
 
     this.accounts = this.accountService.getAccounts();
+    console.log(this.accounts);  // Add this log to inspect if accounts are being fetched properly.
     this.orders = this.standingOrderService.getAll();
+    console.log(this.orders);
+
 
     this.accounts.forEach((account: Account) => {
+      console.log(this.accountMap);
       this.accountMap.set(account.id, account.accountNumber);
     });
   }

@@ -39,8 +39,8 @@ export class SchedulerService {
 
   private processStandingOrder(order: StandingOrder): boolean {
     const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    const fromAccount = accounts.find((acc: Account) => acc.accountNumber === order.fromAccount);
-    const toAccount = accounts.find((acc: Account) => acc.accountNumber === order.toAccount);
+    const fromAccount = accounts.find((acc: Account) => acc.id === order.fromAccount);
+    const toAccount = accounts.find((acc: Account) => acc.id === order.toAccount);
 
     if (!fromAccount || !toAccount) return false;
 
