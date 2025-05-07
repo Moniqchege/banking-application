@@ -21,7 +21,7 @@ import { Account } from '../../core/models/account.model';
 export class StandingOrderComponent implements OnInit {
   form!: FormGroup;
   accounts: Account[] = [];
-  orders: any[] = [];
+  orders: StandingOrder[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -53,8 +53,7 @@ export class StandingOrderComponent implements OnInit {
 
   runScheduler(): void {
     this.schedulerService.runScheduler();
-    this.orders = this.standingOrderService.getAll();
-    alert('Scheduler has run successfully!');
+    this.orders = this.standingOrderService.getAll(); // refresh UI after processing
   }
 
   submit(): void {
@@ -65,9 +64,9 @@ export class StandingOrderComponent implements OnInit {
       const destinationAccount = this.accounts.find(
         (acc) => acc.id === this.form.value.destinationAccountId
       );
-  
+
       const validAccountPrefixes = ['SA', 'CA', 'IA'];
-  
+
       if (
         !sourceAccount ||
         !destinationAccount ||
@@ -83,8 +82,7 @@ export class StandingOrderComponent implements OnInit {
         );
         return;
       }
-  
-      // Get customer name from source account’s customerId
+
       const customers = JSON.parse(localStorage.getItem('customers') || '[]');
       const sourceCustomer = customers.find(
         (c: any) => c.id === sourceAccount.customerId
@@ -92,26 +90,28 @@ export class StandingOrderComponent implements OnInit {
       const customerName = sourceCustomer
         ? `${sourceCustomer.firstName} ${sourceCustomer.lastName}`
         : 'Unknown';
-  
-      const newOrder = {
+
+      const newOrder: StandingOrder = {
+        id: `${new Date().getTime()}`, // Ensure ID for new entry
         amount: this.form.value.amount,
         currency: this.form.value.currency,
         frequency: this.form.value.frequency,
-        nextExecutionDate: this.form.value.nextExecutionDate,
+        nextExecutionDate: new Date(this.form.value.nextExecutionDate).toISOString(),
         fromAccount: sourceAccount.accountNumber,
         toAccount: destinationAccount.accountNumber,
         description: customerName,
+        createdAt: new Date(),
       };
-  
+
       this.standingOrderService.save(newOrder);
-      this.orders = this.standingOrderService.getAll().reverse(); // newest first
+      this.orders = this.standingOrderService.getAll().reverse();
       this.form.reset();
     }
   }
 
   runSingleScheduler(order: StandingOrder): void {
     this.schedulerService.runSingleOrder(order);
-    this.orders = this.standingOrderService.getAll();
+    this.orders = this.standingOrderService.getAll(); // refresh updated nextExecutionDate
   }
 
   deleteOrder(id: string): void {

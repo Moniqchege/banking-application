@@ -2,14 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 export interface StandingOrder {
-  sourceAccount: string;
-  destinationAccount: string;
+  id: string;
+  fromAccount: string;
+  toAccount: string;
   amount: number;
-  schedule: string;
+  currency: string;
+  frequency: string;
+  nextExecutionDate: string;
+  description: string;
+  createdAt: Date;
 }
 
 @Component({
   selector: 'app-scheduler',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './scheduler.component.html',
   styleUrls: ['./scheduler.component.css'],
@@ -26,20 +32,26 @@ export class SchedulerComponent {
     );
 
     standingOrders.forEach((order: StandingOrder) => {
-      const sourceAccount = accounts.find(
-        (acc: any) => acc.accountNumber === order.sourceAccount
+      const fromAccount = accounts.find(
+        (acc: any) => acc.accountNumber === order.fromAccount
       );
-      const destinationAccount = accounts.find(
-        (acc: any) => acc.accountNumber === order.destinationAccount
+      const toAccount = accounts.find(
+        (acc: any) => acc.accountNumber === order.toAccount
       );
 
-      if (sourceAccount && destinationAccount) {
-        sourceAccount.balance -= order.amount;
+      if (fromAccount && toAccount) {
+        if (fromAccount.balance < order.amount) {
+          console.warn(
+            `Insufficient balance in account ${order.fromAccount} for order ${order.id}`
+          );
+          return;
+        }
 
-        destinationAccount.balance += order.amount;
+        fromAccount.balance -= order.amount;
+        toAccount.balance += order.amount;
 
         console.log(
-          `Transfer of ${order.amount} from ${order.sourceAccount} to ${order.destinationAccount}`
+          `Transfer of ${order.amount} ${order.currency} from ${order.fromAccount} to ${order.toAccount}`
         );
       } else {
         console.error('Invalid account details for standing order', order);
@@ -47,7 +59,6 @@ export class SchedulerComponent {
     });
 
     localStorage.setItem('accounts', JSON.stringify(accounts));
-
     this.message = 'Scheduler executed and balances updated.';
   }
 }
